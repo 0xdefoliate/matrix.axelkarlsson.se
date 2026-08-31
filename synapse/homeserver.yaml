@@ -1,0 +1,41 @@
+# Server name is set in /etc/matrix-synapse/conf.d/server_name.yaml
+pid_file: "/var/run/matrix-synapse.pid"
+listeners:
+- bind_addresses:
+  - 127.0.0.1
+  port: 8008
+  resources:
+  - compress: false
+    names:
+    - client
+    - federation
+  tls: false
+  type: http
+  x_forwarded: true
+database:
+  name: psycopg2
+  args:
+    user: synapse_user
+    password: %POSTGRES_PLACEHOLDER_PASSWORD
+    dbname: synapse
+    host: 127.0.0.1
+    cp_min: 5
+    cp_max: 10
+    keepalives_idle: 10
+    keepalives_interval: 10
+    keepalives_count: 3
+log_config: "/etc/matrix-synapse/log.yaml"
+media_store_path: "/var/lib/matrix-synapse/media"
+signing_key_path: "/etc/matrix-synapse/homeserver.signing.key"
+trusted_key_servers:
+- server_name: "matrix.org"
+max_upload_size: "10M"
+max_avatar_size: "10M"
+allowed_avatar_mimetypes: ["image/png", "image/jpeg"]
+password_config:
+  policy:
+    enabled: true
+    minimum_length: 24
+media_retention:
+  local_media_lifetime: 60d
+  remote_media_lifetime: 1d
