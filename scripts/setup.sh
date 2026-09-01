@@ -5,6 +5,9 @@ cd || true
 
 . "$HOME"/config/env
 
+# completely useless Google Cloud cruft which takes up a bunch of RAM etc.
+sudo apt purge google-cloud-cli -y || true
+
 sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y --no-install-recommends python3
 
@@ -15,7 +18,7 @@ synapse_postgres_password="$(python3 -c 'import secrets; print(secrets.token_hex
 sudo apt install -y postgresql libpq5
 
 sudo -u postgres psql <<EOF
-create role synapse_user noinherit createrole login password '$synapse_postgres_password';
+create role synapse_user login password '$synapse_postgres_password';
 EOF
 
 sudo -u postgres createdb \
@@ -77,16 +80,12 @@ rm "$HOME"/config/cron/crontab
 echo "dns_cloudflare_api_token = $DNS_CLOUDFLARE_TOKEN" > "$HOME"/.cloudflare.ini
 chmod 600 "$HOME"/.cloudflare.ini
 
-domains="matrix.axelkarlsson.se axelkarlsson.se"
-
-for domain in $domains; do
-    /opt/certbot/bin/certbot certonly                        \
-        --dns-cloudflare                                     \
-        --dns-cloudflare-credentials "$HOME"/.cloudflare.ini \
-        -d "$domain"                                         \
-        --non-interactive                                    \
-        --agree-tos
-done
+/opt/certbot/bin/certbot certonly                        \
+    --dns-cloudflare                                     \
+    --dns-cloudflare-credentials "$HOME"/.cloudflare.ini \
+    -d "*.axelkarlsson.se"                               \
+    --non-interactive                                    \
+    --agree-tos
 
 ## Apache
 
@@ -136,9 +135,6 @@ done
 
 ### Google Cloud (if hosted there)
 
-# saves a bit of RAM, useful on lower-end machines this server is hosted on.
-sudo apt remove -y google-cloud-cli
-
 useless_gcloud_services="google-cloud-ops-agent-fluent-bit google-cloud-ops-agent-opentelemetry-collector google-cloud-ops-agent"
 
 for junk in $useless_gcloud_services; do
@@ -149,3 +145,9 @@ done
 ### ---
 
 sudo apt autoremove -y
+rm -rf "$HOME"/config
+
+sudo systemctl restart apache2.service
+sudo systemctl restart postgresql.service
+sudo systemctl restart postgresql@17-main.service
+sudo systemctl restart matrix-synapse.service

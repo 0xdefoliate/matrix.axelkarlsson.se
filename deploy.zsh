@@ -4,13 +4,13 @@ function main {
     local cwd
     cwd="$(dirname "${0:A}")"
 
-    if [[ "$1" == "new" ]]; then
+    if [[ "$1" == "init" ]]; then
         if [[ ! -f "$cwd"/.env ]]; then
             printf "Missing .env file in project root!\n"
             printf "You need to enter the following key-value pairs in .env:\n"
             printf "  * REMOTE_USER -- an unprivileged user which can perform sudo commands without a password\n"
             printf "  * REMOTE_HOST -- the hostname you want to install the Matrix server to\n"
-            printf "  * DNS_CLOUDFLARE_TOKEN -- a fine-grained Cloudflare token which is allowed to write to DNS\n"
+            printf "  * DNS_CLOUDFLARE_TOKEN -- a fine-grained Cloudflare token which is allowed to write to DNS records\n"
             exit 1
         fi
 
