@@ -39,3 +39,4 @@ password_config:
 media_retention:
   local_media_lifetime: 60d
   remote_media_lifetime: 1d
+registration_shared_secret: %PLACEHOLDER_REGISTRATION_SHARED_SECRET

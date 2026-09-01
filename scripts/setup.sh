@@ -12,6 +12,7 @@ sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y --no-install-recommends python3
 
 synapse_postgres_password="$(python3 -c 'import secrets; print(secrets.token_hex(64), end="")')"
+registration_shared_secret="$(python3 -c 'import secrets; print(secrets.token_hex(64), end="")')"
 
 ## Postgres
 
@@ -38,6 +39,7 @@ sudo apt update -y
 sudo apt install -y --no-install-recommends matrix-synapse-py3
 
 sed -i 's/%POSTGRES_PLACEHOLDER_PASSWORD/'"$synapse_postgres_password/" "$HOME"/config/synapse/homeserver.yaml
+sed -i 's/%PLACEHOLDER_REGISTRATION_SHARED_SECRET/'"$registration_shared_secret/" "$HOME"/config/synapse/homeserver.yaml
 
 # shellcheck disable=SC2002
 cat "$HOME"/config/synapse/homeserver.yaml | \
